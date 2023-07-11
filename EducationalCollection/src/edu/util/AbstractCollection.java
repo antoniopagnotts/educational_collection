@@ -4,6 +4,9 @@ import java.util.Iterator;
 
 public abstract class AbstractCollection<T> extends Object implements Collection<T> {
 	
+	/**
+	 * Constructor
+	 */
 	protected AbstractCollection() {}
 	
 	/**
@@ -43,6 +46,7 @@ public abstract class AbstractCollection<T> extends Object implements Collection
 	 * @param o - element whose presence in this collection is to be tested
 	 * @return true if this collection contains the specified element.
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean contains(Object o) {
 		T casted_o = (T)o;
 		for(T t: this)
@@ -55,14 +59,33 @@ public abstract class AbstractCollection<T> extends Object implements Collection
 	 * @param c - collection to be checked for containment in this collection
 	 * @return true if this collection contains all of the elements in the specified collection
 	 */
-	public abstract boolean containsAll(Collection<?> c);
+	@SuppressWarnings("unchecked")
+	public boolean containsAll(Collection<?> c) {
+		boolean found = false;
+		Iterator<T> it1 = this.iterator();
+		Iterator<T> it2 = (Iterator<T>) c.iterator();
+		while(it2.hasNext()) {
+			T e2 = it2.next();
+			while(it1.hasNext()) {
+				T e1 = it1.next();
+				if(e1.equals(e2)) {
+					found = true;
+					break;
+				}
+			}
+			if(!found)
+				return false;
+			found = false;
+		}
+		return true;
+	}
 	
 	/**
 	 * Returns true if this collection contains no elements.
 	 * @return true if this collection contains no elements.
 	 */
 	public boolean isEmpty() {
-		return this.size() == 0;
+		return !this.iterator().hasNext();
 	}
 	
 	/**
@@ -76,6 +99,7 @@ public abstract class AbstractCollection<T> extends Object implements Collection
 	 * @param o
 	 * @return true if an element was removed as a result of this call
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean remove(Object o) {
 		T casted_o = (T)o;
 		Iterator<T> it = this.iterator();
@@ -94,7 +118,23 @@ public abstract class AbstractCollection<T> extends Object implements Collection
 	 * @param c - collection containing elements to be removed from this collection
 	 * @return true if this collection changed as a result of the call
 	 */
-	public abstract boolean removeAll(Collection<?> c);
+	@SuppressWarnings("unchecked")
+	public boolean removeAll(Collection<?> c) {
+		boolean ret = false;
+		Iterator<T> it1 = this.iterator();
+		Iterator<T> it2 = (Iterator<T>) c.iterator();
+		while(it2.hasNext()) {
+			T e2 = it2.next();
+			while(it1.hasNext()) {
+				T e1 = it1.next();
+				if(e1.equals(e2)) {
+					it1.remove();
+					ret = true;
+				}
+			}
+		}
+		return ret;
+	}
 	
 	/**
 	 * Returns the number of elements in this collection. If this collection contains more than Integer.MAX_VALUE elements, returns Integer.MAX_VALUE.
